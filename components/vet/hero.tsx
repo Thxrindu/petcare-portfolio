@@ -1,8 +1,53 @@
+'use client';
+
 import Image from 'next/image';
 import { Star, ShieldCheck, Heart, PawPrint } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useEffect, useRef } from 'react';
 
 export function Hero() {
+  const leftPupilRef = useRef<HTMLDivElement>(null);
+  const rightPupilRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      const movePupil = (
+        pupil: HTMLDivElement | null,
+        maxX: number,
+        maxY: number
+      ) => {
+        if (!pupil) return;
+
+        const eyeX = window.innerWidth / 2;
+        const eyeY = window.innerHeight / 2;
+
+        const deltaX = event.clientX - eyeX;
+        const deltaY = event.clientY - eyeY;
+
+        const angle = Math.atan2(deltaY, deltaX);
+
+        const distance = Math.min(
+          Math.sqrt(deltaX * deltaX + deltaY * deltaY) / 40,
+          1
+        );
+
+        const x = Math.cos(angle) * maxX * distance;
+        const y = Math.sin(angle) * maxY * distance;
+
+        pupil.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+      };
+
+      movePupil(leftPupilRef.current, 7, 5);
+      movePupil(rightPupilRef.current, 7, 5);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
+
   return (
     <section id='top' className='relative overflow-hidden'>
       {/* soft warm background shapes */}
@@ -93,14 +138,15 @@ export function Hero() {
               <div
                 className='absolute'
                 style={{
-                  left: '44%',
-                  top: '33%',
+                  left: '46.5%',
+                  top: '35.5%',
                   width: '35',
                   height: '28px',
                   transform: 'translate(-50%, -50%)',
                 }}
               >
                 <div
+                  ref={leftPupilRef}
                   style={{
                     width: '20px',
                     height: '20px',
@@ -123,14 +169,15 @@ export function Hero() {
               <div
                 className='absolute'
                 style={{
-                  left: '61%',
-                  top: '41%',
+                  left: '64%',
+                  top: '44%',
                   width: '35px',
                   height: '28px',
                   transform: 'translate(-50%, -50%)',
                 }}
               >
                 <div
+                  ref={rightPupilRef}
                   style={{
                     width: '20px',
                     height: '20px',
