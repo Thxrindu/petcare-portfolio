@@ -4,10 +4,12 @@ import Image from 'next/image';
 import { Star, ShieldCheck, Heart, PawPrint } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useEffect, useRef } from 'react';
+import gsap from 'gsap';
 
 export function Hero() {
   const leftPupilRef = useRef<HTMLDivElement>(null);
   const rightPupilRef = useRef<HTMLDivElement>(null);
+  const heroDogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
@@ -18,8 +20,14 @@ export function Hero() {
       ) => {
         if (!pupil) return;
 
-        const eyeX = window.innerWidth / 2;
-        const eyeY = window.innerHeight / 2;
+        // const eyeX = window.innerWidth / 2;
+        // const eyeY = window.innerHeight / 2;
+        const rect = heroDogRef.current?.getBoundingClientRect();
+
+        if (!rect) return;
+
+        const eyeX = rect.left + rect.width * 0.55;
+        const eyeY = rect.top + rect.height * 0.4;
 
         const deltaX = event.clientX - eyeX;
         const deltaY = event.clientY - eyeY;
@@ -34,7 +42,14 @@ export function Hero() {
         const x = Math.cos(angle) * maxX * distance;
         const y = Math.sin(angle) * maxY * distance;
 
-        pupil.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+        // pupil.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+        //gsapimplementation
+        gsap.to(pupil, {
+          x,
+          y,
+          duration: 0.5,
+          ease: 'elastic.out(1, 0.4)',
+        });
       };
 
       movePupil(leftPupilRef.current, 7, 5);
@@ -47,6 +62,26 @@ export function Hero() {
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
+
+  const resetPupils = () => {
+    if (leftPupilRef.current) {
+      gsap.to(leftPupilRef.current, {
+        x: 0,
+        y: 0,
+        duration: 0.5,
+        ease: 'power3.out',
+      });
+    }
+
+    if (rightPupilRef.current) {
+      gsap.to(rightPupilRef.current, {
+        x: 0,
+        y: 0,
+        duration: 0.5,
+        ease: 'power3.out',
+      });
+    }
+  };
 
   return (
     <section id='top' className='relative overflow-hidden'>
@@ -116,7 +151,10 @@ export function Hero() {
         <div className='relative animate-fade-up [animation-delay:200ms]'>
           <div className='relative mx-auto aspect-square w-full max-w-md'>
             <div className='absolute inset-0 animate-blob bg-primary/25' />
-            <div className='animate-float absolute inset-3 overflow-hidden rounded-[45%_55%_63%_37%/41%_44%_56%_59%]'>
+            <div
+              ref={heroDogRef}
+              className='animate-float absolute inset-3 overflow-hidden rounded-[45%_55%_63%_37%/41%_44%_56%_59%]'
+            >
               <Image
                 src='/images/hero-bg.png'
                 alt='A happy, healthy golden retriever'
@@ -153,7 +191,9 @@ export function Hero() {
                     position: 'absolute',
                     left: '50%',
                     top: '50%',
-                    transform: 'translate(-50%, -50%)',
+                    // transform: 'translate(-50%, -50%)',
+                    marginLeft: '-10px',
+                    marginTop: '-10px',
                   }}
                 >
                   <Image
